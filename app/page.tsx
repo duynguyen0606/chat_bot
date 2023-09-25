@@ -15,6 +15,7 @@ export default function Home() {
     setChatLog(prev => [...prev, { type: 'user', message: value }])
 
     sendMessage(value)
+    setValue('')
   }
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: '#fff' }} spin />;
