@@ -12,7 +12,7 @@ export default function Home() {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
 
-    setChatLog(prev => [...prev, { type: 'user', message: value }])
+    setChatLog(prev => [...prev, { role: 'user', content: value }])
 
     sendMessage(value)
     setValue('')
@@ -27,9 +27,11 @@ export default function Home() {
       'Authorization': `Bearer ${process.env.NEXT_PUBLIC_OPEN_AI_KEY}`
     }
 
+    const fullChatLog = [...chatLog, { "role": "user", "content": message }]
+
     const data = {
       model: 'gpt-3.5-turbo',
-      messages: [{ "role": "user", "content": message }],
+      messages: fullChatLog
       // prompt: `You are a smart, experienced and casual technical support agency for an eccomerce web application company called Duy-Tom.
       // If the answer to the questiion is not in the docuent specified below:
 
@@ -43,7 +45,7 @@ export default function Home() {
     axios.post(url, data, { headers: headers })
       .then(response => {
         console.log(response)
-        setChatLog(prev => [...prev, { type: 'bot', message: response.data.choices[0].message.content }])
+        setChatLog(prev => [...prev, { role: response.data.choices[0].message.role, content: response.data.choices[0].message.content }])
         setIsLoading(false)
       }).catch((error) => {
         setIsLoading(false)
@@ -58,9 +60,9 @@ export default function Home() {
         <div className='flex-grow p-6'>
           <div className='flex flex-col space-y-4'>
             {chatLog.map((message, index) => (
-              <div className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`} key={index}>
-                <div className={`${message.type === 'user' ? 'bg-purple-500' : 'bg-gray-800'} rounded-lg p-4 text-white max-w-sm`}>
-                  {message.message}
+              <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`} key={index}>
+                <div className={`${message.role === 'user' ? 'bg-purple-500' : 'bg-gray-800'} rounded-lg p-4 text-white max-w-sm`}>
+                  {message.content}
                 </div>
               </div>
             ))}
