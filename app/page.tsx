@@ -3,19 +3,24 @@
 import axios from "axios"
 import { FormEvent, useState } from "react"
 import { LoadingOutlined } from '@ant-design/icons';
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 
 export default function Home() {
   const [value, setValue] = useState('')
   const [chatLog, setChatLog] = useState<Array<any>>([])
   const [loading, setIsLoading] = useState(false)
+
+  const [messageApi, contextHolder] = message.useMessage();
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
 
-    setChatLog(prev => [...prev, { role: 'user', content: value }])
+    if (!loading && value.trim()) {
+      setChatLog(prev => [...prev, { role: 'user', content: value }])
 
-    sendMessage(value)
-    setValue('')
+      sendMessage(value)
+      setValue('')
+    }
   }
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24, color: '#fff' }} spin />;
@@ -49,6 +54,13 @@ export default function Home() {
         setIsLoading(false)
       }).catch((error) => {
         setIsLoading(false)
+        messageApi.open({
+          type: 'error',
+          content: 'The request token is maximum, please reload the page to continue!',
+          style: {
+            marginTop: '20vh',
+          },
+        });
         console.log(error)
       })
   }
